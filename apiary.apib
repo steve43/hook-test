@@ -1,181 +1,69 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
 
-# Docs Test
+# Data Structures API
+Following [Advanced Attributes](09.%20Advanced%20Attributes.md), this example demonstrates defining arbitrary data structure to be reused by various attribute descriptions.
 
-Polls is a simple API allowing consumers to view polls and vote in them. Test
+Since a portion of the `Coupon` data structure is shared between the `Coupon` definition itself and the `Create a Coupon` action, it was separated into a `Coupon Base` data structure in the `Data Structures` API Blueprint Section. Doing so enables us to reuse it as a base-type of other attribute definitions.
 
-# Polls API Root [/]
+<a href="http://smizell.com" target="test">test</a>
 
-This resource does not have any attributes. Instead it offers the initial
-API affordances in the form of the links in the JSON body.
+## API Blueprint
++ [Previous: Advanced Attributes](09.%20Advanced%20Attributes.md)
++ [This: Raw API Blueprint](https://raw.github.com/apiaryio/api-blueprint/master/examples/10.%20Data%20Structures.md)
++ [Next: Resource Model](11.%20Resource%20Model.md)
 
-It is recommend to follow the “url” link values,
-[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
-applicable to retrieve resources. Instead of constructing your own URLs,
-to keep your client decoupled from implementation details.
+# Group Coupons
 
-## Retrieve the Entry Point [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "questions_url": "/questions"
-        }
-
-## Group Question
-
-Resources related to questions in the API.
-
-## Question [/questions/{question_id}]
-
-A Question object has the following attributes:
-
-+ question
-+ published_at - An ISO8601 date when the question was published.
-+ url
-+ choices - An array of Choice objects.
+## Coupon [/coupons/{id}]
+A coupon contains information about a percent-off or amount-off discount you might want to apply to a customer.
 
 + Parameters
-    + question_id: 1 (required, number) - ID of the Question in form of an integer
+    + id (string)
 
-### View a Questions Detail [GET]
+        The ID of the desired coupon.
 
-+ Response 200 (application/json)
++ Attributes (Coupon Base)
+    + id: 250FF (string)
+    + created: 1415203908 (number) - Time stamp
 
-        {
-            "question": "Favourite programming language?",
-            "published_at": "2014-11-11T08:40:51.620Z",
-            "url": "/questions/1",
-            "choices": [
-                {
-                    "choice": "Swift",
-                    "url": "/questions/1/choices/1",
-                    "votes": 2048
-                }, {
-                    "choice": "Python",
-                    "url": "/questions/1/choices/2",
-                    "votes": 1024
-                }, {
-                    "choice": "Objective-C",
-                    "url": "/questions/1/choices/3",
-                    "votes": 512
-                }, {
-                    "choice": "Ruby",
-                    "url": "/questions/1/choices/4",
-                    "votes": 256
-                }
-            ]
-        }
-
-## Choice [/questions/{question_id}/choices/{choice_id}]
-
-+ Parameters
-    + question_id: 1 (required, number) - ID of the Question in form of an integer
-    + choice_id: 1 (required, number) - ID of the Choice in form of an integer
-
-### Vote on a Choice [POST]
-
-This action allows you to vote on a question's choice.
-
-+ Response 201
-
-    + Headers
-
-            Location: /questions/1
-
-## Questions Collection [/questions{?page}]
-
-+ Parameters
-    + page: 1 (optional, number) - The page of questions to return
-
-### List All Questions [GET]
+### Retrieve a Coupon [GET]
+Retrieves the coupon with the given ID.
 
 + Response 200 (application/json)
+    + Attributes (Coupon)
 
-    + Headers
+## Coupons [/coupons{?limit}]
 
-            Link: </questions?page=2>; rel="next"
++ Attributes (array[Coupon])
 
-    + Body
+### List all Coupons [GET]
+Returns a list of your coupons.
 
-            [
-                {
-                    "question": "Favourite programming language?",
-                    "published_at": "2014-11-11T08:40:51.620Z",
-                    "url": "/questions/1",
-                    "choices": [
-                        {
-                            "choice": "Swift",
-                            "url": "/questions/1/choices/1",
-                            "votes": 2048
-                        }, {
-                            "choice": "Python",
-                            "url": "/questions/1/choices/2",
-                            "votes": 1024
-                        }, {
-                            "choice": "Objective-C",
-                            "url": "/questions/1/choices/3",
-                            "votes": 512
-                        }, {
-                            "choice": "Ruby",
-                            "url": "/questions/1/choices/4",
-                            "votes": 256
-                        }
-                    ]
-                }
-            ]
++ Parameters
+    + limit (number, optional)
 
-### Create a New Question [POST]
+        A limit on the number of objects to be returned. Limit can range between 1 and 100 items.
 
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+        + Default: `10`
 
-+ question (string) - The question
-+ choices (array[string]) - A collection of choices.
++ Response 200 (application/json)
+    + Attributes (Coupons)
+
+### Create a Coupon [POST]
+Creates a new Coupon.
+
++ Attributes (Coupon Base)
 
 + Request (application/json)
 
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
-        }
++ Response 200 (application/json)
+    + Attributes (Coupon)
 
-+ Response 201 (application/json)
+# Data Structures
 
-    + Headers
-
-            Location: /questions/2
-
-    + Body
-
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2014-11-11T08:40:51.620Z",
-                "url": "/questions/2",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "url": "/questions/2/choices/1",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "url": "/questions/2/choices/2",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "url": "/questions/2/choices/3",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "url": "/questions/2/choices/4",
-                        "votes": 0
-                    }
-                ]
-            }
+## Coupon Base (object)
++ a (array[Test])
+    
+## Test (object)
++ foo: bar (string, required)
++ hello: world (string, required)
